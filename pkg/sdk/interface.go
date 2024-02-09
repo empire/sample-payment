@@ -1,7 +1,12 @@
 package sdk
 
+type (
+	AccountID int
+	Amount    int
+)
+
 type PaymentService interface {
-	Deposit(req *DepositRequest) (*DepositResponse, error)
-	Balance(req *BalanceRequest) (*BalanceResponse, error)
-	Withdraw(req *WithdrawRequest) (*WithdrawResponse, error)
+	Deposit(accountID AccountID, amount Amount) (string, error)
+	Balance(accountID AccountID) (Amount, error)
+	Withdraw(accountID AccountID, amount Amount) (string, error)
 }

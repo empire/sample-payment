@@ -22,131 +22,130 @@ func NewClient(baseURL string) *Client {
 	}
 }
 
-type DepositRequest struct {
-	AccountID int `json:"accountID"`
-	Amount    int `json:"amount"`
-}
+func (c *Client) Deposit(accountID AccountID, amount Amount) (string, error) {
+	type require struct {
+		AccountID AccountID `json:"accountID"`
+		Amount    Amount    `json:"amount"`
+	}
 
-type DepositResponse struct {
-	Message string
-}
-
-func (c *Client) Deposit(req *DepositRequest) (*DepositResponse, error) {
-	reqBody, err := json.Marshal(req)
+	reqBody, err := json.Marshal(require{AccountID: accountID, Amount: amount})
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	httpReq, err := http.NewRequest("POST", c.BaseURL+"/deposit", bytes.NewReader(reqBody))
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	httpReq.Header.Set("Content-Type", "application/json")
 
 	httpResp, err := c.HTTPClient.Do(httpReq)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	defer httpResp.Body.Close()
 
 	respBody, err := io.ReadAll(httpResp.Body)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	if httpResp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("deposit failed: %s", respBody)
+		return "", fmt.Errorf("deposit failed: %s", respBody)
 	}
 
-	return &DepositResponse{Message: string(respBody)}, nil
+	return string(respBody), nil
 }
 
-type BalanceRequest struct {
-	AccountID int `json:"accountID"`
-}
+func (c *Client) Balance(accountID AccountID) (Amount, error) {
+	type request struct {
+		AccountID AccountID `json:"accountID"`
+	}
 
-type BalanceResponse struct {
-	Balance int `json:"balance"`
-}
+	type response struct {
+		Balance Amount `json:"balance"`
+	}
 
-func (c *Client) Balance(req *BalanceRequest) (*BalanceResponse, error) {
+	req := request{AccountID: accountID}
+
 	reqBody, err := json.Marshal(req)
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
 
 	httpReq, err := http.NewRequest("GET", c.BaseURL+"/balance", bytes.NewReader(reqBody))
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
 
 	httpReq.Header.Set("Content-Type", "application/json")
 
 	httpResp, err := c.HTTPClient.Do(httpReq)
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
 	defer httpResp.Body.Close()
 
 	respBody, err := io.ReadAll(httpResp.Body)
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
 
 	if httpResp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("balance failed: %s", respBody)
+		return 0, fmt.Errorf("balance failed: %s", respBody)
 	}
 
-	var resp BalanceResponse
+	var resp response
 	err = json.Unmarshal(respBody, &resp)
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
-	return &resp, nil
+	return resp.Balance, nil
 }
 
-type WithdrawRequest struct {
-	AccountID int `json:"accountID"`
-	Amount    int `json:"amount"`
-}
+func (c *Client) Withdraw(accountID AccountID, amount Amount) (string, error) {
+	type request struct {
+		AccountID AccountID `json:"accountID"`
+		Amount    Amount    `json:"amount"`
+	}
 
-type WithdrawResponse struct {
-	Message string `json:"message"`
-}
+	type response struct {
+		Message string `json:"message"`
+	}
 
-func (c *Client) Withdraw(req *WithdrawRequest) (*WithdrawResponse, error) {
+	req := request{AccountID: accountID, Amount: amount}
 	reqBody, err := json.Marshal(req)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	httpReq, err := http.NewRequest("POST", c.BaseURL+"/withdraw", bytes.NewReader(reqBody))
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	httpReq.Header.Set("Content-Type", "application/json")
 
 	httpResp, err := c.HTTPClient.Do(httpReq)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	defer httpResp.Body.Close()
 
 	respBody, err := io.ReadAll(httpResp.Body)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	if httpResp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("withdraw failed: %s", respBody)
+		return "", fmt.Errorf("withdraw failed: %s", respBody)
 	}
 
-	var resp WithdrawResponse
+	var resp response
 	err = json.Unmarshal(respBody, &resp)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	return &resp, nil
+	return resp.Message, nil
 }

@@ -46,7 +46,7 @@ func runServer() {
 
 func runClient() {
 	client := sdk.NewClient("http://localhost:8080")
-	client.Deposit(&sdk.DepositRequest{AccountID: 1, Amount: 230})
+	client.Deposit(1, 230)
 
 	app := p2p.NewPeerToPeerPaymentApp(client)
 

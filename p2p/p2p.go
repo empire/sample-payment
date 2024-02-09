@@ -17,20 +17,12 @@ func NewPeerToPeerPaymentApp(service sdk.PaymentService) *PeerToPeerPaymentApp {
 }
 
 func (app *PeerToPeerPaymentApp) MakePayment(senderID, receiverID int, amount int) (string, error) {
-	withdrawReq := &sdk.WithdrawRequest{
-		AccountID: senderID,
-		Amount:    amount,
-	}
-	_, err := app.paymentService.Withdraw(withdrawReq)
+	_, err := app.paymentService.Withdraw(sdk.AccountID(senderID), sdk.Amount(amount))
 	if err != nil {
 		return "", fmt.Errorf("failed to withdraw from sender's account: %w", err)
 	}
 
-	depositReq := &sdk.DepositRequest{
-		AccountID: receiverID,
-		Amount:    amount,
-	}
-	_, err = app.paymentService.Deposit(depositReq)
+	_, err = app.paymentService.Deposit(sdk.AccountID(receiverID), sdk.Amount(amount))
 	if err != nil {
 		return "", fmt.Errorf("failed to deposit to receiver's account: %w", err)
 	}
@@ -39,13 +31,10 @@ func (app *PeerToPeerPaymentApp) MakePayment(senderID, receiverID int, amount in
 }
 
 func (app *PeerToPeerPaymentApp) CheckBalance(userID int) (int, error) {
-	balanceReq := &sdk.BalanceRequest{
-		AccountID: userID,
-	}
-	balanceResp, err := app.paymentService.Balance(balanceReq)
+	balance, err := app.paymentService.Balance(sdk.AccountID(userID))
 	if err != nil {
-		return 0, fmt.Errorf("Failed to check balance for user %d: %v", userID, err)
+		return 0, fmt.Errorf("failed to check balance for user %d: %v", userID, err)
 	}
 
-	return balanceResp.Balance, nil
+	return int(balance), nil
 }
