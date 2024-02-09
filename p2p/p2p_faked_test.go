@@ -27,3 +27,11 @@ func Test_Faked_MakeRequest(t *testing.T) {
 	require.NoError(t, err)
 	require.EqualValues(t, 1200, amount)
 }
+
+func Test_Faked_CheckBalance(t *testing.T) {
+	ps := fake.NewFakePaymentService(map[sdk.AccountID]sdk.Amount{1: 1500})
+	app := NewPeerToPeerPaymentApp(ps)
+	amount, err := app.CheckBalance(1)
+	require.NoError(t, err)
+	require.Equal(t, 1500, amount)
+}

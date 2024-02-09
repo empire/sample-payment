@@ -32,3 +32,17 @@ func Test_Mock_MakePayment(t *testing.T) {
 	require.EqualValues(t, 1, account)
 	require.EqualValues(t, 1000, amount)
 }
+
+func Test_Mock_CheckBalance(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	ps := mock_sdk.NewMockPaymentService(ctrl)
+	app := NewPeerToPeerPaymentApp(ps)
+
+	ps.EXPECT().Balance(gomock.Any()).Return(1000, nil)
+
+	amount, err := app.CheckBalance(1)
+	require.NoError(t, err)
+	require.EqualValues(t, 1000, amount)
+}
