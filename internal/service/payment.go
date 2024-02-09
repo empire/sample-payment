@@ -1,4 +1,4 @@
-package payment
+package service
 
 import (
 	"database/sql"
@@ -32,7 +32,7 @@ func NewPaymentService(dbPath string) (*PaymentService, error) {
 	return &PaymentService{db: db}, nil
 }
 
-func (ps *PaymentService) Deposit(accountID int64, amount float64) error {
+func (ps *PaymentService) Deposit(accountID int, amount float64) error {
 	stmt, err := ps.db.Prepare("INSERT INTO payments (account_id, amount) VALUES (?, ?)")
 	if err != nil {
 		return err
@@ -43,14 +43,14 @@ func (ps *PaymentService) Deposit(accountID int64, amount float64) error {
 	return err
 }
 
-func (ps *PaymentService) Balance(accountID int64) (float64, error) {
+func (ps *PaymentService) Balance(accountID int) (float64, error) {
 	var totalBalance float64
 	row := ps.db.QueryRow("SELECT SUM(amount) FROM payments WHERE account_id = ?", accountID)
 	err := row.Scan(&totalBalance)
 	return totalBalance, err
 }
 
-func (ps *PaymentService) Withdraw(accountID int64, amount float64) error {
+func (ps *PaymentService) Withdraw(accountID int, amount float64) error {
 	balance, err := ps.Balance(accountID)
 	if err != nil {
 		return err
