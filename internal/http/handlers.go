@@ -9,8 +9,8 @@ import (
 
 func deposit(service *service.PaymentService) http.HandlerFunc {
 	type request struct {
-		AccountID int     `json:"accountID"` // The ID of the account to deposit to
-		Amount    float64 `json:"amount"`    // The amount to deposit
+		AccountID int     `json:"accountID"`
+		Amount    float64 `json:"amount"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -20,7 +20,7 @@ func deposit(service *service.PaymentService) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		// Call the Deposit method of the payment service
+
 		err = service.Deposit(req.AccountID, req.Amount)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -33,7 +33,7 @@ func deposit(service *service.PaymentService) http.HandlerFunc {
 
 func balance(service *service.PaymentService) http.HandlerFunc {
 	type request struct {
-		AccountID int `json:"accountID"` // The ID of the account to check the balance
+		AccountID int `json:"accountID"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -57,8 +57,8 @@ func balance(service *service.PaymentService) http.HandlerFunc {
 
 func withdraw(service *service.PaymentService) http.HandlerFunc {
 	type request struct {
-		AccountID int     `json:"accountID"` // The ID of the account to withdraw from
-		Amount    float64 `json:"amount"`    // The amount to withdraw
+		AccountID int     `json:"accountID"`
+		Amount    float64 `json:"amount"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
